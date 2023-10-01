@@ -21,7 +21,6 @@ class FluxAction {
 
 List<Expense> counterReducer(List<Expense> state, dynamic action) {
   if (action.type == Type.add) {
-    print(state.length);
     return List.of(state)..add(action.payload);
   }
   if (action.type == Type.remove) {

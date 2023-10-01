@@ -100,12 +100,16 @@ class ExpenseListView extends StatelessWidget {
                             borderRadius: BorderRadius.circular(18.0),
                             side: const BorderSide(color: Colors.black26)))),
                 onPressed: () async {
-                  await Navigator.push(
+                  FluxAction? action = await Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => const AddAndEditExpense()),
-                  ).then((action) => value.dispatch(action));
-                  _animatedListKey.currentState!.insertItem(list.length - 1);
+                  );
+                  if(action != null){
+                    value.dispatch(action);
+                    _animatedListKey.currentState!.insertItem(list.length - 1);
+                  }
+
                 },
                 child: const Icon(Icons.add),
               );
