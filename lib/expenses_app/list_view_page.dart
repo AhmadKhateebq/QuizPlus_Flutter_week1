@@ -13,7 +13,7 @@ class ExpenseListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double extent = 0.25;
+    double extent = 0.5;
     return StoreConnector<List<Expense>, List<Expense>>(
       converter: (store) => store.state,
       builder: (context, list) {
@@ -25,7 +25,7 @@ class ExpenseListView extends StatelessWidget {
                 initialItemCount: list.length,
                 itemBuilder: (context, index, animation) {
                   return Slidable(
-                      startActionPane: ActionPane(
+                      endActionPane: ActionPane(
                         extentRatio: extent,
                         motion: const DrawerMotion(),
                         children: [
@@ -52,28 +52,25 @@ class ExpenseListView extends StatelessWidget {
                               );
                             },
                           ),
-                        ],
-                      ),
-
-                      // The end action pane is the one at the right or the bottom side.
-                      endActionPane: ActionPane(
-                        extentRatio: extent,
-                        motion: const StretchMotion(),
-                        children: [
                           StoreConnector<List<Expense>, Store<List<Expense>>>(
                               converter: (store) {
                             return store;
                           }, builder: (context, value) {
                             return SlidableAction(
                               onPressed: (context) async {
-                                FluxAction action = await Navigator.push(
+                                Expense expense = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => AddAndEditExpense(
-                                            index: index,
+                                            value: "${list[index].value}",
+                                            date: list[index].date,
+                                            name: list[index].name,
+                                            title: "Edit Expense",
+                                            buttonText: "Save Changes",
                                           )),
                                 );
-                                value.dispatch(action);
+                                value.dispatch(FluxAction(
+                                    type: Type.edit, payload: expense,meta: list[index]));
                               },
                               backgroundColor: const Color(0xFF7BC043),
                               foregroundColor: Colors.white,
@@ -83,6 +80,7 @@ class ExpenseListView extends StatelessWidget {
                           }),
                         ],
                       ),
+
                       child: _buildTaskItem(list[index], animation));
                 },
               ),
@@ -100,16 +98,18 @@ class ExpenseListView extends StatelessWidget {
                             borderRadius: BorderRadius.circular(18.0),
                             side: const BorderSide(color: Colors.black26)))),
                 onPressed: () async {
-                  FluxAction? action = await Navigator.push(
+                  Expense? expense = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const AddAndEditExpense()),
+                        builder: (context) => const AddAndEditExpense(
+                              title: "Add New Expense",
+                              buttonText: "Save",
+                            )),
                   );
-                  if(action != null){
-                    value.dispatch(action);
+                  if (expense != null) {
+                    value.dispatch(FluxAction(type: Type.add,payload: expense));
                     _animatedListKey.currentState!.insertItem(list.length - 1);
                   }
-
                 },
                 child: const Icon(Icons.add),
               );
