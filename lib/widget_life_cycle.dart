@@ -54,9 +54,10 @@ class _MyPageState extends State<MyPage> {
     print("deactivate");
     super.deactivate();
   }
-
+  TextEditingController controller = TextEditingController(text: "init");
   @override
   Widget build(BuildContext context) {
+
     print("build");
     return Scaffold(
       appBar: AppBar(
@@ -64,8 +65,16 @@ class _MyPageState extends State<MyPage> {
       ),
       body: Column(
         children: [
-          Text(_counter.toString()),
-          ElevatedButton(onPressed: _increment, child: const Text("Increment"))
+          Text(controller.text),
+          TextField(
+            controller: controller,
+            onChanged: (text){
+              setState(() {
+                
+              });
+            },
+          ),
+          ElevatedButton(onPressed: (){}, child: const Text("Increment"))
         ],
       ),
     );

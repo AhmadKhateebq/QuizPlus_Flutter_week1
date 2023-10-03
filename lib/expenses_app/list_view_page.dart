@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -13,6 +14,8 @@ class ExpenseListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log("\n",name: "");
+    log("build",name: "Top level builder");
     double extent = 0.5;
     return StoreConnector<List<Expense>, List<Expense>>(
       converter: (store) => store.state,
@@ -31,18 +34,20 @@ class ExpenseListView extends StatelessWidget {
                         children: [
                           StoreConnector<List<Expense>, VoidCallback>(
                             converter: (store) {
-                              return () => store.dispatch(FluxAction(
-                                  type: Type.remove, payload: list[index]));
+                              return () {
+                                _animatedListKey.currentState!.removeItem(
+                                    index,
+                                    (context, animation) =>
+                                        _buildTaskItem(list[index], animation),
+                                    duration:
+                                        const Duration(milliseconds: 500));
+                                store.dispatch(FluxAction(
+                                    type: Type.remove, payload: list[index]));
+                              };
                             },
                             builder: (context, value) {
                               return SlidableAction(
                                 onPressed: (context) async => {
-                                  _animatedListKey.currentState!.removeItem(
-                                      index,
-                                      (context, animation) => _buildTaskItem(
-                                          list[index], animation)),
-                                  // await Future.delayed(const Duration(seconds: 1)),
-                                  // list.removeAt(index),
                                   value.call(),
                                 },
                                 backgroundColor: const Color(0xFFFE4A49),
@@ -56,6 +61,7 @@ class ExpenseListView extends StatelessWidget {
                               converter: (store) {
                             return store;
                           }, builder: (context, value) {
+                                log("slidable action builder Entered",name: "slidable action");
                             return SlidableAction(
                               onPressed: (context) async {
                                 Expense expense = await Navigator.push(
@@ -70,7 +76,9 @@ class ExpenseListView extends StatelessWidget {
                                           )),
                                 );
                                 value.dispatch(FluxAction(
-                                    type: Type.edit, payload: expense,meta: list[index]));
+                                    type: Type.edit,
+                                    payload: expense,
+                                    meta: list[index]));
                               },
                               backgroundColor: const Color(0xFF7BC043),
                               foregroundColor: Colors.white,
@@ -80,7 +88,6 @@ class ExpenseListView extends StatelessWidget {
                           }),
                         ],
                       ),
-
                       child: _buildTaskItem(list[index], animation));
                 },
               ),
@@ -107,7 +114,8 @@ class ExpenseListView extends StatelessWidget {
                             )),
                   );
                   if (expense != null) {
-                    value.dispatch(FluxAction(type: Type.add,payload: expense));
+                    value
+                        .dispatch(FluxAction(type: Type.add, payload: expense));
                     _animatedListKey.currentState!.insertItem(list.length - 1);
                   }
                 },
@@ -121,20 +129,62 @@ class ExpenseListView extends StatelessWidget {
   }
 
   Widget _buildTaskItem(Expense expense, Animation<double> animation) {
+
+    return SizedTransitionWidget(
+      animation: animation,
+      expense: expense,
+    );
+  }
+}
+class SizedTransitionWidget extends StatefulWidget {
+  const SizedTransitionWidget({super.key, required this.animation, required this.expense});
+  final Animation<double> animation;
+  final Expense expense;
+  @override
+  State<SizedTransitionWidget> createState() => _SizedTransitionWidgetState();
+}
+
+class _SizedTransitionWidgetState extends State<SizedTransitionWidget> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    log("${widget.expense.name} init",sequenceNumber: 0,name: "size transition");
+  }
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    log("${widget.expense.name} didChangeDependencies",sequenceNumber: 0,name: "size transition");
+  }
+  @override
+  void didUpdateWidget(covariant SizedTransitionWidget oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
+    log("${widget.expense.name} didUpdateWidget",sequenceNumber: 0,name: "size transition");
+  }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    log("${widget.expense.name} dispose",sequenceNumber: 0,name: "size transition");
+  }
+  @override
+  Widget build(BuildContext context) {
     return SizeTransition(
-        sizeFactor: animation,
+        sizeFactor: widget.animation,
         child: Card(
             color: Colors.white,
             child: ListTile(
               title: Text(
-                expense.name.toString(),
+                widget.expense.name.toString(),
                 textAlign: TextAlign.center,
               ),
               subtitle: Text(
-                "${expense.value} \$",
+                "${widget.expense.value} \$",
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 24, fontFamily: 'Lobster'),
               ),
             )));
   }
 }
+

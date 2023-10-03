@@ -1,12 +1,16 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
-enum Type { increment, decrement, reset,set }
-class Action{
+enum Type { increment, decrement, reset, set }
+
+class Action {
   Type type;
   int? payload;
+
   Action({required this.type, this.payload});
 }
 
@@ -20,7 +24,7 @@ int counterReducer(int state, dynamic action) {
   if (action == Type.reset) {
     return state = 0;
   }
-  if(action.type == Type.set){
+  if (action.type == Type.set) {
     return state = action.payload;
   }
   return state;
@@ -32,7 +36,7 @@ void main() {
   runApp(StoreProvider<int>(
       store: store,
       child: MaterialApp(
-        debugShowCheckedModeBanner: false,
+          debugShowCheckedModeBanner: false,
           title: title,
           home: FlutterReduxApp(
             title: title,
@@ -52,6 +56,7 @@ class FlutterReduxApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log("build 1");
     TextEditingController controller = TextEditingController();
     return Scaffold(
         appBar: AppBar(
@@ -64,6 +69,7 @@ class FlutterReduxApp extends StatelessWidget {
               StoreConnector<int, int>(
                 converter: (store) => (store.state),
                 builder: (context, count) {
+                  log("text build");
                   return Text(
                     'Counter : $count',
                   );
@@ -81,6 +87,7 @@ class FlutterReduxApp extends StatelessWidget {
                 return () => store.dispatch(Type.increment);
               },
               builder: (context, callback) {
+                log("button build");
                 return FloatingActionButton(
                   onPressed: callback,
                   tooltip: 'Increment',
@@ -114,7 +121,8 @@ class FlutterReduxApp extends StatelessWidget {
             ),
             StoreConnector<int, VoidCallback>(
               converter: (store) {
-                return () => store.dispatch(Action(payload: int.parse(controller.text),type: Type.set));
+                return () => store.dispatch(Action(
+                    payload: int.parse(controller.text), type: Type.set));
               },
               builder: (context, callback) {
                 return FloatingActionButton(

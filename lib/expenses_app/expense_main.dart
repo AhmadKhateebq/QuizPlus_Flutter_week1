@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -20,6 +22,7 @@ class FluxAction {
 }
 
 List<Expense> counterReducer(List<Expense> state, dynamic action) {
+  log("${action.type}");
   if (action.type == Type.add) {
     return List.of(state)..add(action.payload);
   }
@@ -27,9 +30,8 @@ List<Expense> counterReducer(List<Expense> state, dynamic action) {
     return List.of(state)..remove(action.payload);
   }
   if (action.type == Type.edit) {
-    int id = state.indexOf(action.payload);
-    return List.of(state)..[id] = action.meta;
-
+    int index = state.indexOf(action.payload);
+    return List.of(state)..[index] = action.meta;
   }
   return state;
 }

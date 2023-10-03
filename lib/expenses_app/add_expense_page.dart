@@ -70,7 +70,7 @@ class _AddAndEditExpenseState extends State<AddAndEditExpense> {
         ),
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(16.0), // Add padding to the content
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -156,7 +156,7 @@ class _AddAndEditExpenseState extends State<AddAndEditExpense> {
   }
   showDate(){
     BottomPicker.date(
-        title:  "Set your Birthday",
+        title:  "Set The Expense Date",
         initialDateTime: selectedDate,
         titleStyle:  const TextStyle(
             fontWeight:  FontWeight.bold,
